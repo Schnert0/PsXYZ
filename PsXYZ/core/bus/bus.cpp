@@ -17,7 +17,8 @@ Bus::Bus(){
 Bus::~Bus(){
 }
 
-void Bus::getComponents(GPU* gpuPtr, DMA* dmaPtr){
+void Bus::getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr){
+    cpu = cpuPtr;
     gpu = gpuPtr;
     dma = dmaPtr;
 }
@@ -72,6 +73,7 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
           break;
 
         case 0x1f801070 ... 0x1f801074: // I_STAT and I_MASK
+          cpu->readInterrupt(addr - 0x1f801070);
           break;
 
         case 0x1f801080 ... 0x1f8010ff: // DMA registers
@@ -134,6 +136,7 @@ void Bus::store(Uint32 address, Uint32 data, Uint8 width){
           break;
 
         case 0x1f801070 ... 0x1f801074: // I_STAT and I_MASK
+          cpu->writeInterrupt(addr - 0x1f801070, data);
           break;
 
         case 0x1f801080 ... 0x1f8010ff: // DMA registers

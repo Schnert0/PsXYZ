@@ -5,7 +5,7 @@ void CPU::op_ILLEGAL(){
         printf("CPU: error - unidentified special opcode 0x%02x at 0x%08x\n", ins.fn, currPC);
     else
         printf("CPU: error - unidentified opcode 0x%02x at 0x%08x\n", ins.op, currPC);
-    getchar();
+    //getchar();
 }
 
 

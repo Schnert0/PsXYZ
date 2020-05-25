@@ -6,9 +6,11 @@
 #include <string.h>
 
 #include "../common.h"
+#include "../cpu/cpu.h"
 #include "../gpu/gpu.h"
 #include "../dma/dma.h"
 
+class CPU;
 class DMA;
 
 Uint32 read(Uint32 offset);
@@ -17,6 +19,7 @@ void write(Uint32 offset, Uint32 data);
 
 class Bus{
 private:
+    CPU* cpu;
     GPU* gpu;
     DMA* dma;
 
@@ -37,7 +40,7 @@ private:
 public:
      Bus();
     ~Bus();
-    void getComponents(GPU* gpuPtr, DMA* dmaPtr);
+    void getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr);
 
     void reset();
 

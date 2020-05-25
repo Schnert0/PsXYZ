@@ -9,7 +9,7 @@ System::System(Renderer* rendererPtr){
     cpu = new CPU;
 
     gpu->getComponents(renderer);
-    bus->getComponents(gpu, dma);
+    bus->getComponents(cpu, gpu, dma);
     dma->getComponents(gpu, bus);
     cpu->getComponents(bus);
 }

@@ -9,6 +9,7 @@
 #include "../bus/bus.h"
 
 enum{
+    EXCEPTION_INTERRUPT   = 0x00,
     EXCEPTION_LOADADDR    = 0x04,
     EXCEPTION_STOREADDR   = 0x05,
     EXCEPTION_SYSCALL     = 0x08,
@@ -18,6 +19,8 @@ enum{
     EXCEPTION_OVERFLOW    = 0x0c
 };
 
+class Bus;
+
 class CPU{
 private:
     Bus* bus;
@@ -25,18 +28,18 @@ private:
     int cycles;
 
     union{
-        struct {
-            Uint32 fn : 6;
-            Uint32 sh : 5;
-            Uint32 rd : 5;
-            Uint32 rt : 5;
-            Uint32 rs : 5;
-            Uint32 op : 6;
-        };
-        Uint32 raw;
-        Uint32 target : 26;
-        Uint16 imm;
-        Sint16 offset;
+      struct {
+        Uint32 fn : 6;
+        Uint32 sh : 5;
+        Uint32 rd : 5;
+        Uint32 rt : 5;
+        Uint32 rs : 5;
+        Uint32 op : 6;
+      };
+      Uint32 raw;
+      Uint32 target : 26;
+      Uint16 imm;
+      Sint16 offset;
     }ins;
 
     Uint32 r[32];
@@ -53,8 +56,10 @@ private:
     Uint8  indexDelay;
     Uint8  indexSlot;
 
+    Uint32 istat, imask;
+
     struct{
-        Uint32 r[16];
+      Uint32 r[16];
     }cop0;
 
     #ifdef DEBUG
@@ -149,6 +154,9 @@ public:
 
     void reset();
     void runFrame();
+
+    Uint32 readInterrupt(Uint32 offset);
+    void  writeInterrupt(Uint32 offset, Uint32 data);
 };
 
 #endif // cpu_h
