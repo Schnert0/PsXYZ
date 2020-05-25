@@ -30,12 +30,11 @@ void Bus::loadBIOS(const char* path){
     FILE* file = fopen(path, "rb");
     if(!file){
         printf("[BUS]\tERROR: unable to load \"%s\"\n", path);
-        getchar();
     }
     fseek(file, 0, SEEK_END);
     Uint32 fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
-    printf("BIOS is %d bytes\n", fileSize);
+    printf("[BUS]\tBIOS is %d bytes\n", fileSize);
 
     if(fileSize == 524288){
         fread(bios.b, BIOS_SIZE, sizeof(Uint8), file);
@@ -43,7 +42,7 @@ void Bus::loadBIOS(const char* path){
         printf("[BUS]\tERROR: incorrect file size for BIOS\n");
     }
     fclose(file);
-    printf("[BUS]\t BIOS loaded successfully\n");
+    printf("[BUS]\tBIOS loaded successfully\n");
 }
 
 Uint32 Bus::load(Uint32 address, Uint8 width){
@@ -53,7 +52,7 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
         case WIDTH_BYTE: return ram.b[(addr - RAM_START)     ];
         case WIDTH_HALF: return ram.h[(addr - RAM_START) >> 1];
         case WIDTH_WORD: return ram.w[(addr - RAM_START) >> 2];
-        default: printf("[BUS]\tERROR: undefined width %d\n", width); getchar();
+        default: printf("[BUS]\tERROR: undefined width %d\n", width);
         }
     }
     else if(IN_RANGE(EXP1_START, EXP1_SIZE)){
@@ -61,7 +60,7 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
         case WIDTH_BYTE: return 0xff;
         case WIDTH_HALF: return 0xffff;
         case WIDTH_WORD: return 0xffffffff;
-        default: printf("[BUS]\tERROR: undefined width %d\n", width); getchar();
+        default: printf("[BUS]\tERROR: undefined width %d\n", width);
         }
     }
     else if(IN_RANGE(IO_START, IO_SIZE)){
@@ -105,7 +104,7 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
         case WIDTH_BYTE: return bios.b[(addr - BIOS_START)     ];
         case WIDTH_HALF: return bios.h[(addr - BIOS_START) >> 1];
         case WIDTH_WORD: return bios.w[(addr - BIOS_START) >> 2];
-        default: printf("[BUS]\tERROR: undefined width %d\n", width); getchar();
+        default: printf("[BUS]\tERROR: undefined width %d\n", width);
         }
     }
     else if(IN_RANGE(CACHECTRL_START, CACHECTRL_SIZE)){
@@ -123,7 +122,7 @@ void Bus::store(Uint32 address, Uint32 data, Uint8 width){
         case WIDTH_BYTE: ram.b[(addr - RAM_START)     ] = data; break;
         case WIDTH_HALF: ram.h[(addr - RAM_START) >> 1] = data; break;
         case WIDTH_WORD: ram.w[(addr - RAM_START) >> 2] = data; break;
-        default: printf("[BUS]\tERROR: undefined width %d\n", width); getchar();
+        default: printf("[BUS]\tERROR: undefined width %d\n", width);
         }
     }
     else if(IN_RANGE(IO_START, IO_SIZE)){

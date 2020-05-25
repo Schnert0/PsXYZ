@@ -28,6 +28,9 @@ int main(int argc, char* argv[]){
         case SDLK_F1:
           system.reset();
           break;
+        case SDLK_F2:
+          renderer.toggleWireframe();
+          break;
         }
         break;
       }

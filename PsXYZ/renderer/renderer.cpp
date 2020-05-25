@@ -12,13 +12,25 @@ Renderer::Renderer(){
   SDL_GL_SwapWindow(window);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  wireframeEnabled = true;
+  wireframeEnabled = false;
 }
 
 
 Renderer::~Renderer(){
   SDL_DestroyWindow(window);
   SDL_Quit();
+}
+
+
+void Renderer::toggleWireframe(){
+  glClear(GL_COLOR_BUFFER_BIT);
+  SDL_GL_SwapWindow(window);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  if(wireframeEnabled)
+    wireframeEnabled = false;
+  else
+    wireframeEnabled = true;
 }
 
 

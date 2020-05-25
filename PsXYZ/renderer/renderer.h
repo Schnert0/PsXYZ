@@ -14,6 +14,8 @@ public:
    Renderer();
   ~Renderer();
 
+  void toggleWireframe();
+
   void update();
 
   void drawMonochromeQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, Uint8 r, Uint8 g, Uint8 b);
