@@ -9,9 +9,11 @@
 #include "../cpu/cpu.h"
 #include "../gpu/gpu.h"
 #include "../dma/dma.h"
+#include "../drive/drive.h"
 
 class CPU;
 class DMA;
+class Drive;
 
 Uint32 read(Uint32 offset);
 void write(Uint32 offset, Uint32 data);
@@ -19,9 +21,10 @@ void write(Uint32 offset, Uint32 data);
 
 class Bus{
 private:
-    CPU* cpu;
-    GPU* gpu;
-    DMA* dma;
+    CPU*   cpu;
+    GPU*   gpu;
+    DMA*   dma;
+    Drive* drive;
 
     Uint32 mask[8];
 
@@ -40,7 +43,7 @@ private:
 public:
      Bus();
     ~Bus();
-    void getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr);
+    void getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr, Drive* drivePtr);
 
     void reset();
 

@@ -18,7 +18,6 @@ Renderer::Renderer(){
 
 Renderer::~Renderer(){
   SDL_DestroyWindow(window);
-  SDL_Quit();
 }
 
 

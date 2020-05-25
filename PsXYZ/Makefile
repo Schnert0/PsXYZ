@@ -3,6 +3,7 @@ $(wildcard core/cpu/*.cpp)\
 $(wildcard core/dma/*.cpp)\
 $(wildcard core/gpu/*.cpp)\
 $(wildcard core/bus/*.cpp)\
+$(wildcard core/drive/*.cpp)\
 $(wildcard core/system/*.cpp)\
 $(wildcard renderer/*.cpp)
 

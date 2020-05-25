@@ -17,10 +17,11 @@ Bus::Bus(){
 Bus::~Bus(){
 }
 
-void Bus::getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr){
-    cpu = cpuPtr;
-    gpu = gpuPtr;
-    dma = dmaPtr;
+void Bus::getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr, Drive* drivePtr){
+    cpu   = cpuPtr;
+    gpu   = gpuPtr;
+    dma   = dmaPtr;
+    drive = drivePtr;
 }
 
 void Bus::reset(){
@@ -80,6 +81,10 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
           return dma->read(addr - 0x1f801080);
 
         case 0x1f801100 ... 0x1f80112f: // timers
+          break;
+
+        case 0x1f801800 ... 0x1f801803: // cd drive registers
+          drive->read(addr - 0x1f801800);
           break;
 
         case 0x1f801810: // GP0 register
@@ -144,6 +149,10 @@ void Bus::store(Uint32 address, Uint32 data, Uint8 width){
           break;
 
         case 0x1f801100 ... 0x1f80112f: // timers
+          break;
+
+        case 0x1f801800 ... 0x1f801803: // cd drive registers
+          drive->write(addr - 0x1f801800, data);
           break;
 
         case 0x1f801810: // GP0 register

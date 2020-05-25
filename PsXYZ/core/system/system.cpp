@@ -3,13 +3,14 @@
 System::System(Renderer* rendererPtr){
     renderer = rendererPtr;
 
-    gpu = new GPU;
-    bus = new Bus;
-    dma = new DMA;
-    cpu = new CPU;
+    gpu   = new GPU;
+    bus   = new Bus;
+    dma   = new DMA;
+    cpu   = new CPU;
+    drive = new Drive;
 
     gpu->getComponents(renderer);
-    bus->getComponents(cpu, gpu, dma);
+    bus->getComponents(cpu, gpu, dma, drive);
     dma->getComponents(gpu, bus);
     cpu->getComponents(bus);
 }

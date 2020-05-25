@@ -39,5 +39,6 @@ int main(int argc, char* argv[]){
     renderer.update();
   }
 
+  SDL_Quit();
   return 0;
 }

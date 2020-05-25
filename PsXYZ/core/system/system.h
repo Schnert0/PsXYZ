@@ -7,15 +7,17 @@
 #include "../dma/dma.h"
 #include "../bus/bus.h"
 #include "../cpu/cpu.h"
+#include "../drive/drive.h"
 
 class System{
 private:
   Renderer* renderer;
 
-  GPU* gpu;
-  DMA* dma;
-  Bus* bus;
-  CPU* cpu;
+  GPU*   gpu;
+  DMA*   dma;
+  Bus*   bus;
+  CPU*   cpu;
+  Drive* drive;
 
 public:
    System(Renderer* rendererPtr);
