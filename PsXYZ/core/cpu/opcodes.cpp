@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-void c_cpu::op_ILLEGAL(){
+void CPU::op_ILLEGAL(){
     if(!ins.op)
         printf("CPU: error - unidentified special opcode 0x%02x at 0x%08x\n", ins.fn, currPC);
     else
@@ -9,7 +9,7 @@ void c_cpu::op_ILLEGAL(){
 }
 
 
-void c_cpu::op_LUI(){
+void CPU::op_LUI(){
     storeReg(ins.rt, ins.imm << 16);
 
     #ifdef DEBUG
@@ -18,7 +18,7 @@ void c_cpu::op_LUI(){
 }
 
 
-void c_cpu::op_ORI(){
+void CPU::op_ORI(){
     storeReg(ins.rt, loadReg(ins.rs) | ins.imm);
 
     #ifdef DEBUG
@@ -27,9 +27,9 @@ void c_cpu::op_ORI(){
 }
 
 
-void c_cpu::op_SW(){
+void CPU::op_SW(){
     if(!(cop0.r[12] & 0x10000))
-        mem->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_WORD);
+        bus->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_WORD);
 
     #ifdef DEBUG
         if(debug) printf("SW\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -37,7 +37,7 @@ void c_cpu::op_SW(){
 }
 
 
-void c_cpu::op_SLL(){
+void CPU::op_SLL(){
     storeReg(ins.rd, loadReg(ins.rt) << ins.sh);
 
     #ifdef DEBUG
@@ -46,7 +46,7 @@ void c_cpu::op_SLL(){
 }
 
 
-void c_cpu::op_ADDIU(){
+void CPU::op_ADDIU(){
     storeReg(ins.rt, loadReg(ins.rs) + ins.offset);
 
     #ifdef DEBUG
@@ -55,7 +55,7 @@ void c_cpu::op_ADDIU(){
 }
 
 
-void c_cpu::op_J(){
+void CPU::op_J(){
     jump();
 
     #ifdef DEBUG
@@ -64,7 +64,7 @@ void c_cpu::op_J(){
 }
 
 
-void c_cpu::op_OR(){
+void CPU::op_OR(){
     storeReg(ins.rd, loadReg(ins.rs) | loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -73,7 +73,7 @@ void c_cpu::op_OR(){
 }
 
 
-void c_cpu::op_COP0(){
+void CPU::op_COP0(){
     switch(ins.rs){
         case 0x00: storeLoadDelay(ins.rt, cop0.r[ins.rd]); break;
         case 0x04: cop0.r[ins.rd] = loadReg(ins.rt); break;
@@ -96,7 +96,7 @@ void c_cpu::op_COP0(){
 }
 
 
-void c_cpu::op_BNE(){
+void CPU::op_BNE(){
     if(loadReg(ins.rs) != loadReg(ins.rt))
         branch();
 
@@ -106,7 +106,7 @@ void c_cpu::op_BNE(){
 }
 
 
-void c_cpu::op_ADDI(){
+void CPU::op_ADDI(){
     storeReg(ins.rt, loadReg(ins.rs) + ins.offset);
 
     #ifdef DEBUG
@@ -115,9 +115,9 @@ void c_cpu::op_ADDI(){
 }
 
 
-void c_cpu::op_LW(){
+void CPU::op_LW(){
     if(!(cop0.r[12] & 0x10000))
-        storeLoadDelay(ins.rt, mem->load(loadReg(ins.rs) + ins.offset, WIDTH_WORD));
+        storeLoadDelay(ins.rt, bus->load(loadReg(ins.rs) + ins.offset, WIDTH_WORD));
 
     #ifdef DEBUG
         if(debug) printf("LW\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -125,7 +125,7 @@ void c_cpu::op_LW(){
 }
 
 
-void c_cpu::op_SLTU(){
+void CPU::op_SLTU(){
     storeReg(ins.rd, loadReg(ins.rs) < loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -134,7 +134,7 @@ void c_cpu::op_SLTU(){
 }
 
 
-void c_cpu::op_ADDU(){
+void CPU::op_ADDU(){
     storeReg(ins.rd, loadReg(ins.rs) + loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -143,9 +143,9 @@ void c_cpu::op_ADDU(){
 }
 
 
-void c_cpu::op_SH(){
+void CPU::op_SH(){
     if(!(cop0.r[12] & 0x10000))
-        mem->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_HALF);
+        bus->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_HALF);
 
     #ifdef DEBUG
         if(debug) printf("SH\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -153,7 +153,7 @@ void c_cpu::op_SH(){
 }
 
 
-void c_cpu::op_JAL(){
+void CPU::op_JAL(){
     storeReg(31, currPC+4);
     jump();
 
@@ -163,7 +163,7 @@ void c_cpu::op_JAL(){
 }
 
 
-void c_cpu::op_ANDI(){
+void CPU::op_ANDI(){
     storeReg(ins.rt, loadReg(ins.rs) & ins.imm);
 
     #ifdef DEBUG
@@ -172,9 +172,9 @@ void c_cpu::op_ANDI(){
 }
 
 
-void c_cpu::op_SB(){
+void CPU::op_SB(){
     if(!(cop0.r[12] & 0x10000))
-        mem->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_BYTE);
+        bus->store(loadReg(ins.rs)+ins.offset, loadReg(ins.rt), WIDTH_BYTE);
 
     #ifdef DEBUG
         if(debug) printf("SB\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -182,7 +182,7 @@ void c_cpu::op_SB(){
 }
 
 
-void c_cpu::op_JR(){
+void CPU::op_JR(){
     nextPC = loadReg(ins.rs);
 
     #ifdef DEBUG
@@ -191,9 +191,9 @@ void c_cpu::op_JR(){
 }
 
 
-void c_cpu::op_LB(){
+void CPU::op_LB(){
     if(!(cop0.r[12] & 0x10000))
-        storeLoadDelay(ins.rt, (Sint32)(Sint8)mem->load(loadReg(ins.rs) + ins.offset, WIDTH_BYTE));
+        storeLoadDelay(ins.rt, (Sint32)(Sint8)bus->load(loadReg(ins.rs) + ins.offset, WIDTH_BYTE));
 
     #ifdef DEBUG
         if(debug) printf("LB\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -201,7 +201,7 @@ void c_cpu::op_LB(){
 }
 
 
-void c_cpu::op_BEQ(){
+void CPU::op_BEQ(){
     if(loadReg(ins.rs) == loadReg(ins.rt))
         branch();
 
@@ -211,7 +211,7 @@ void c_cpu::op_BEQ(){
 }
 
 
-void c_cpu::op_AND(){
+void CPU::op_AND(){
     storeReg(ins.rd, loadReg(ins.rs) & loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -220,7 +220,7 @@ void c_cpu::op_AND(){
 }
 
 
-void c_cpu::op_ADD(){
+void CPU::op_ADD(){
     storeReg(ins.rd, loadReg(ins.rs) + loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -229,7 +229,7 @@ void c_cpu::op_ADD(){
 }
 
 
-void c_cpu::op_BGTZ(){
+void CPU::op_BGTZ(){
     if((Sint32)loadReg(ins.rs) > 0)
         branch();
 
@@ -239,7 +239,7 @@ void c_cpu::op_BGTZ(){
 }
 
 
-void c_cpu::op_BLEZ(){
+void CPU::op_BLEZ(){
     if((Sint32)loadReg(ins.rs) <= 0)
         branch();
 
@@ -249,9 +249,9 @@ void c_cpu::op_BLEZ(){
 }
 
 
-void c_cpu::op_LBU(){
+void CPU::op_LBU(){
     if(!(cop0.r[12] & 0x10000))
-        storeLoadDelay(ins.rt, mem->load(loadReg(ins.rs) + ins.offset, WIDTH_BYTE));
+        storeLoadDelay(ins.rt, bus->load(loadReg(ins.rs) + ins.offset, WIDTH_BYTE));
 
     #ifdef DEBUG
         if(debug) printf("LBU\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -259,13 +259,13 @@ void c_cpu::op_LBU(){
 }
 
 
-void c_cpu::op_JALR(){
+void CPU::op_JALR(){
     storeReg(ins.rd, currPC+4);
     nextPC = loadReg(ins.rs);
 }
 
 
-void c_cpu::op_BNZ(){
+void CPU::op_BNZ(){
     bool GE   = (ins.rt & 0x01);
     bool link = (ins.rt & 0x1e) == 0x10;
     bool cond;
@@ -297,7 +297,7 @@ void c_cpu::op_BNZ(){
 }
 
 
-void c_cpu::op_SLTI(){
+void CPU::op_SLTI(){
     storeReg(ins.rt, (Sint32)loadReg(ins.rs) < (Sint32)ins.offset);
 
     #ifdef DEBUG
@@ -306,7 +306,7 @@ void c_cpu::op_SLTI(){
 }
 
 
-void c_cpu::op_SUBU(){
+void CPU::op_SUBU(){
     storeReg(ins.rd, loadReg(ins.rs) - loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -315,7 +315,7 @@ void c_cpu::op_SUBU(){
 }
 
 
-void c_cpu::op_SRA(){
+void CPU::op_SRA(){
     storeReg(ins.rd, (Sint32)loadReg(ins.rt) >> ins.sh);
 
     #ifdef DEBUG
@@ -324,7 +324,7 @@ void c_cpu::op_SRA(){
 }
 
 
-void c_cpu::op_DIV(){
+void CPU::op_DIV(){
     Sint32 a = (Sint32)loadReg(ins.rs);
     Sint32 b = (Sint32)loadReg(ins.rt);
 
@@ -350,7 +350,7 @@ void c_cpu::op_DIV(){
 }
 
 
-void c_cpu::op_MFLO(){
+void CPU::op_MFLO(){
     storeReg(ins.rd, lo);
 
     #ifdef DEBUG
@@ -359,7 +359,7 @@ void c_cpu::op_MFLO(){
 }
 
 
-void c_cpu::op_SRL(){
+void CPU::op_SRL(){
     storeReg(ins.rd, loadReg(ins.rt) >> ins.sh);
 
     #ifdef DEBUG
@@ -368,7 +368,7 @@ void c_cpu::op_SRL(){
 }
 
 
-void c_cpu::op_SLTIU(){
+void CPU::op_SLTIU(){
     storeReg(ins.rt, loadReg(ins.rs) < (Uint32)ins.offset);
 
     #ifdef DEBUG
@@ -377,7 +377,7 @@ void c_cpu::op_SLTIU(){
 }
 
 
-void c_cpu::op_DIVU(){
+void CPU::op_DIVU(){
     Uint32 a = loadReg(ins.rs);
     Uint32 b = loadReg(ins.rt);
 
@@ -396,7 +396,7 @@ void c_cpu::op_DIVU(){
 }
 
 
-void c_cpu::op_MFHI(){
+void CPU::op_MFHI(){
     storeReg(ins.rd, hi);
 
     #ifdef DEBUG
@@ -404,7 +404,7 @@ void c_cpu::op_MFHI(){
     #endif // DEBUG
 }
 
-void c_cpu::op_SLT(){
+void CPU::op_SLT(){
     storeReg(ins.rd, (Sint32)loadReg(ins.rs) < (Sint32)loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -413,12 +413,12 @@ void c_cpu::op_SLT(){
 }
 
 
-void c_cpu::op_SYSCALL(){
+void CPU::op_SYSCALL(){
     raiseException(EXCEPTION_SYSCALL);
 }
 
 
-void c_cpu::op_MTLO(){
+void CPU::op_MTLO(){
     lo = loadReg(ins.rs);
 
     #ifdef DEBUG
@@ -427,7 +427,7 @@ void c_cpu::op_MTLO(){
 }
 
 
-void c_cpu::op_MTHI(){
+void CPU::op_MTHI(){
     hi = loadReg(ins.rs);
 
     #ifdef DEBUG
@@ -436,7 +436,7 @@ void c_cpu::op_MTHI(){
 }
 
 
-void c_cpu::op_RFE(){
+void CPU::op_RFE(){
     Uint32 sr = cop0.r[12];
 
     Uint32 mode = sr & 0x3f;
@@ -447,16 +447,16 @@ void c_cpu::op_RFE(){
 }
 
 
-void c_cpu::op_LHU(){
+void CPU::op_LHU(){
     if(!(cop0.r[12] & 0x10000))
-        storeLoadDelay(ins.rt, mem->load(loadReg(ins.rs) + ins.offset, WIDTH_HALF));
+        storeLoadDelay(ins.rt, bus->load(loadReg(ins.rs) + ins.offset, WIDTH_HALF));
 
     #ifdef DEBUG
         if(debug) printf("LHU\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
     #endif // DEBUG
 }
 
-void c_cpu::op_SLLV(){
+void CPU::op_SLLV(){
     storeReg(ins.rd, loadReg(ins.rt) << (loadReg(ins.rs) & 0x1f));
 
     #ifdef DEBUG
@@ -465,9 +465,9 @@ void c_cpu::op_SLLV(){
 }
 
 
-void c_cpu::op_LH(){
+void CPU::op_LH(){
     if(!(cop0.r[12] & 0x10000))
-        storeLoadDelay(ins.rt, (Sint32)(Sint16)mem->load(loadReg(ins.rs) + ins.offset, WIDTH_HALF));
+        storeLoadDelay(ins.rt, (Sint32)(Sint16)bus->load(loadReg(ins.rs) + ins.offset, WIDTH_HALF));
 
     #ifdef DEBUG
         if(debug) printf("LH\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -475,7 +475,7 @@ void c_cpu::op_LH(){
 }
 
 
-void c_cpu::op_NOR(){
+void CPU::op_NOR(){
    storeReg(ins.rd, ~(loadReg(ins.rs) | loadReg(ins.rt)));
 
     #ifdef DEBUG
@@ -484,7 +484,7 @@ void c_cpu::op_NOR(){
 }
 
 
-void c_cpu::op_SRAV(){
+void CPU::op_SRAV(){
     storeReg(ins.rd, (Sint32)loadReg(ins.rt) >> (loadReg(ins.rs) & 0x1f));
 
     #ifdef DEBUG
@@ -493,7 +493,7 @@ void c_cpu::op_SRAV(){
 }
 
 
-void c_cpu::op_SRLV(){
+void CPU::op_SRLV(){
     storeReg(ins.rd, loadReg(ins.rt) >> (loadReg(ins.rs) & 0x1f));
 
     #ifdef DEBUG
@@ -502,7 +502,7 @@ void c_cpu::op_SRLV(){
 }
 
 
-void c_cpu::op_MULTU(){
+void CPU::op_MULTU(){
     Uint64 a = loadReg(ins.rs);
     Uint64 b = loadReg(ins.rt);
 
@@ -517,7 +517,7 @@ void c_cpu::op_MULTU(){
 }
 
 
-void c_cpu::op_XOR(){
+void CPU::op_XOR(){
     storeReg(ins.rd, loadReg(ins.rs) ^ loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -526,7 +526,7 @@ void c_cpu::op_XOR(){
 }
 
 
-void c_cpu::op_BREAK(){
+void CPU::op_BREAK(){
     raiseException(EXCEPTION_BREAK);
 
     #ifdef DEBUG
@@ -535,7 +535,7 @@ void c_cpu::op_BREAK(){
 }
 
 
-void c_cpu::op_MULT(){
+void CPU::op_MULT(){
     Sint64 a = (Sint64)(Sint32)loadReg(ins.rs);
     Sint64 b = (Sint64)(Sint32)loadReg(ins.rt);
 
@@ -550,7 +550,7 @@ void c_cpu::op_MULT(){
 }
 
 
-void c_cpu::op_SUB(){
+void CPU::op_SUB(){
     storeReg(ins.rd, loadReg(ins.rs) - loadReg(ins.rt));
 
     #ifdef DEBUG
@@ -559,7 +559,7 @@ void c_cpu::op_SUB(){
 }
 
 
-void c_cpu::op_XORI(){
+void CPU::op_XORI(){
     storeReg(ins.rt, loadReg(ins.rs) ^ ins.imm);
 
     #ifdef DEBUG
@@ -568,26 +568,26 @@ void c_cpu::op_XORI(){
 }
 
 
-void c_cpu::op_COP1(){
+void CPU::op_COP1(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_COP2(){
+void CPU::op_COP2(){
     switch(ins.rs){
     default: printf("COP2: error - undefined COP2 opcode 0x%02x at 0x%02x\n", ins.rs, currPC); getchar();
     }
 }
 
 
-void c_cpu::op_COP3(){
+void CPU::op_COP3(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_LWL(){
+void CPU::op_LWL(){
     Uint32 addr = loadReg(ins.rs) + ins.offset;
-    Uint32 data = mem->load(addr & 0xfffffffc, WIDTH_WORD);
+    Uint32 data = bus->load(addr & 0xfffffffc, WIDTH_WORD);
 
     Uint32 reg;
     if(indexDelay == ins.rt)
@@ -610,9 +610,9 @@ void c_cpu::op_LWL(){
 }
 
 
-void c_cpu::op_LWR(){
+void CPU::op_LWR(){
     Uint32 addr = loadReg(ins.rs) + ins.offset;
-    Uint32 data = mem->load(addr & 0xfffffffc, WIDTH_WORD);
+    Uint32 data = bus->load(addr & 0xfffffffc, WIDTH_WORD);
 
     Uint32 reg;
     if(indexSlot == ins.rt)
@@ -635,9 +635,9 @@ void c_cpu::op_LWR(){
 }
 
 
-void c_cpu::op_SWL(){
+void CPU::op_SWL(){
     Uint32 addr = loadReg(ins.rs) + ins.offset;
-    Uint32 data = mem->load(addr & 0xfffffffc, WIDTH_WORD);
+    Uint32 data = bus->load(addr & 0xfffffffc, WIDTH_WORD);
 
     Uint32 reg = loadReg(ins.rt);
 
@@ -648,7 +648,7 @@ void c_cpu::op_SWL(){
     case 2: result = (reg & 0xff000000) | (data >>  8);
     case 3: result = (reg & 0x00000000) | (data      );
     }
-    mem->store(addr & 0xfffffffc, result, WIDTH_WORD);
+    bus->store(addr & 0xfffffffc, result, WIDTH_WORD);
 
     #ifdef DEBUG
         if(debug) printf("LWL\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -656,9 +656,9 @@ void c_cpu::op_SWL(){
 }
 
 
-void c_cpu::op_SWR(){
+void CPU::op_SWR(){
     Uint32 addr = loadReg(ins.rs) + ins.offset;
-    Uint32 data = mem->load(addr & 0xfffffffc, WIDTH_WORD);
+    Uint32 data = bus->load(addr & 0xfffffffc, WIDTH_WORD);
 
     Uint32 reg = loadReg(ins.rt);
 
@@ -669,7 +669,7 @@ void c_cpu::op_SWR(){
     case 2: result = (reg & 0x0000ffff) | (data << 16);
     case 3: result = (reg & 0x00ffffff) | (data << 24);
     }
-    mem->store(addr & 0xfffffffc, result, WIDTH_WORD);
+    bus->store(addr & 0xfffffffc, result, WIDTH_WORD);
 
     #ifdef DEBUG
         if(debug) printf("LWL\t$%d, 0x%04x($%d)\n", ins.rt, ins.imm, ins.rs);
@@ -677,43 +677,43 @@ void c_cpu::op_SWR(){
 }
 
 
-void c_cpu::op_LWC0(){
+void CPU::op_LWC0(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_LWC1(){
+void CPU::op_LWC1(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_LWC2(){
+void CPU::op_LWC2(){
     printf("CPU: error - unhandled GTE LWC2\n");
     getchar();
 }
 
 
-void c_cpu::op_LWC3(){
+void CPU::op_LWC3(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_SWC0(){
+void CPU::op_SWC0(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_SWC1(){
+void CPU::op_SWC1(){
     raiseException(EXCEPTION_COPROCESSOR);
 }
 
 
-void c_cpu::op_SWC2(){
+void CPU::op_SWC2(){
     printf("CPU: error - unhandled GTE SWC2\n");
     getchar();
 }
 
 
-void c_cpu::op_SWC3(){
+void CPU::op_SWC3(){
     raiseException(EXCEPTION_COPROCESSOR);
 }

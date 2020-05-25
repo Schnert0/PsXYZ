@@ -1,16 +1,16 @@
 #include "cpu.h"
 
-c_cpu::c_cpu(){
+CPU::CPU(){
 }
 
-c_cpu::~c_cpu(){
+CPU::~CPU(){
 }
 
-void c_cpu::getComponents(c_mem* memPtr){
-    mem = memPtr;
+void CPU::getComponents(Bus* busPtr){
+    bus = busPtr;
 }
 
-void c_cpu::reset(){
+void CPU::reset(){
     ins.raw = 0;
 
     memset(r, 0, sizeof(r));
@@ -25,7 +25,7 @@ void c_cpu::reset(){
     #endif // DEBUG
 }
 
-void c_cpu::runFrame(){
+void CPU::runFrame(){
     cycles = 591900;
     while(cycles > 0){
         runInstruction();
@@ -33,8 +33,8 @@ void c_cpu::runFrame(){
     }
 }
 
-void c_cpu::runInstruction(){
-    ins.raw = mem->load(currPC, WIDTH_WORD);
+void CPU::runInstruction(){
+    ins.raw = bus->load(currPC, WIDTH_WORD);
 
     currPC = nextPC;
     nextPC += 4;
@@ -115,7 +115,7 @@ void c_cpu::runInstruction(){
 }
 
 
-void c_cpu::op_special(){
+void CPU::op_special(){
     switch(ins.fn){
     case 0x00: op_SLL();     break;
     case 0x02: op_SRL();     break;
@@ -150,7 +150,7 @@ void c_cpu::op_special(){
 }
 
 
-void c_cpu::raiseException(Uint8 code){
+void CPU::raiseException(Uint8 code){
     Uint32 sr = cop0.r[12];
     Uint32 cause = cop0.r[13];
 
@@ -182,16 +182,16 @@ void c_cpu::raiseException(Uint8 code){
 }
 
 
-void c_cpu::storeReg(Uint8 index, Uint32 data){
+void CPU::storeReg(Uint8 index, Uint32 data){
     if(index == indexSlot){
         dataSlot = 0;
         indexSlot = 0;
-        printf("CPU: load delay slot overwritten\n");
+        printf("[CPU]\tload delay slot overwritten\n");
     }
     r[index] = data;
 }
 
-void c_cpu::storeLoadDelay(Uint8 index, Uint32 data){
+void CPU::storeLoadDelay(Uint8 index, Uint32 data){
     if(index == indexSlot)
         r[index] = dataSlot;
 
@@ -199,16 +199,16 @@ void c_cpu::storeLoadDelay(Uint8 index, Uint32 data){
     dataDelay  = data;
 }
 
-Uint32 c_cpu::loadReg(Uint8 index){
+Uint32 CPU::loadReg(Uint8 index){
     return r[index];
 }
 
-void c_cpu::jump(){
+void CPU::jump(){
     nextPC = (currPC & 0xf0000000) | (ins.target << 2);
     branchDelay = true;
 }
 
-void c_cpu::branch(){
+void CPU::branch(){
     nextPC = currPC + (ins.offset << 2);
     branchDelay = true;
 }

@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "../gpu/gpu.h"
-#include "../memory/memory.h"
+#include "../bus/bus.h"
 
 typedef struct{
     Uint32 baseAddr;
@@ -41,10 +41,10 @@ typedef struct{
 
 class c_mem;
 
-class c_dma{
+class DMA{
 private:
-    c_gpu* gpu;
-    c_mem* mem;
+    GPU* gpu;
+    class Bus* bus;
 
     s_chan channel[8];
     Uint32 control;
@@ -67,9 +67,9 @@ private:
     void doLinkedList(Uint8 chan);
 
 public:
-     c_dma();
-    ~c_dma();
-    void getComponents(c_gpu* gpuPtr, c_mem* memPtr);
+     DMA();
+    ~DMA();
+    void getComponents(GPU* gpuPtr, Bus* busPtr);
 
     void reset();
 

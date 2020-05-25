@@ -1,8 +1,3 @@
-#my local repositiory for .gitignore
-$ C:\Users\Ian\Documents\coding\c\psXYZ
-
-#ignores all Code::Blocks files and extensions
-
 #extensions
 *.exe
 *.depend
@@ -11,8 +6,8 @@ $ C:\Users\Ian\Documents\coding\c\psXYZ
 *.txt
 *.bin
 *.dll
+.DS_Store
 
 #directories
 psXYZ/bin
 psXYZ/obj
-

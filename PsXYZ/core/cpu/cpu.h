@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "../common.h"
-#include "../memory/memory.h"
+#include "../bus/bus.h"
 
 enum{
     EXCEPTION_LOADADDR    = 0x04,
@@ -18,9 +18,9 @@ enum{
     EXCEPTION_OVERFLOW    = 0x0c
 };
 
-class c_cpu{
+class CPU{
 private:
-    c_mem* mem;
+    Bus* bus;
 
     int cycles;
 
@@ -143,9 +143,9 @@ private:
     void op_SWC3();
 
 public:
-     c_cpu();
-    ~c_cpu();
-    void getComponents(c_mem* memPtr);
+     CPU();
+    ~CPU();
+    void getComponents(Bus* busPtr);
 
     void reset();
     void runFrame();

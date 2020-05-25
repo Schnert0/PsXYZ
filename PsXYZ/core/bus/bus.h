@@ -9,16 +9,16 @@
 #include "../gpu/gpu.h"
 #include "../dma/dma.h"
 
-class c_dma;
+class DMA;
 
 Uint32 read(Uint32 offset);
 void write(Uint32 offset, Uint32 data);
 
 
-class c_mem{
+class Bus{
 private:
-    c_gpu* gpu;
-    c_dma* dma;
+    GPU* gpu;
+    DMA* dma;
 
     Uint32 mask[8];
 
@@ -35,9 +35,9 @@ private:
     }bios;
 
 public:
-     c_mem();
-    ~c_mem();
-    void getComponents(c_gpu* gpuPtr, c_dma* dmaPtr);
+     Bus();
+    ~Bus();
+    void getComponents(GPU* gpuPtr, DMA* dmaPtr);
 
     void reset();
 
