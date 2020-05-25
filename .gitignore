@@ -6,6 +6,7 @@
 *.txt
 *.bin
 *.dll
+*.o
 .DS_Store
 
 #directories
