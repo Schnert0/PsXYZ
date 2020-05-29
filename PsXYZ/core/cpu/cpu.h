@@ -8,17 +8,6 @@
 #include "../common.h"
 #include "../bus/bus.h"
 
-enum{
-    EXCEPTION_INTERRUPT   = 0x00,
-    EXCEPTION_LOADADDR    = 0x04,
-    EXCEPTION_STOREADDR   = 0x05,
-    EXCEPTION_SYSCALL     = 0x08,
-    EXCEPTION_BREAK       = 0x09,
-    EXCEPTION_ILLEGAL_OP  = 0x0a,
-    EXCEPTION_COPROCESSOR = 0x0b,
-    EXCEPTION_OVERFLOW    = 0x0c
-};
-
 class Bus;
 
 class CPU{
@@ -157,6 +146,8 @@ public:
 
     Uint32 readInterrupt(Uint32 offset);
     void  writeInterrupt(Uint32 offset, Uint32 data);
+
+    void interruptRequest(Uint8 irq);
 };
 
 #endif // cpu_h

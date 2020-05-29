@@ -27,4 +27,29 @@ enum{
     WIDTH_WORD
 };
 
+enum{
+    EXCEPTION_INTERRUPT   = 0x00,
+    EXCEPTION_LOADADDR    = 0x04,
+    EXCEPTION_STOREADDR   = 0x05,
+    EXCEPTION_SYSCALL     = 0x08,
+    EXCEPTION_BREAK       = 0x09,
+    EXCEPTION_ILLEGAL_OP  = 0x0a,
+    EXCEPTION_COPROCESSOR = 0x0b,
+    EXCEPTION_OVERFLOW    = 0x0c
+};
+
+enum{
+  IRQ_VBLANK     = 0,
+  IRQ_GPU        = 1,
+  IRQ_CDROM      = 2,
+  IRQ_DMA        = 3,
+  IRQ_TMR0       = 4,
+  IRQ_TMR1       = 5,
+  IRQ_TMR2       = 6,
+  IRQ_CONTROLLER = 7,
+  IRQ_SIO        = 8,
+  IRQ_SPU        = 9,
+  IRQ_LIGHTPEN   = 10
+};
+
 #endif // common_h

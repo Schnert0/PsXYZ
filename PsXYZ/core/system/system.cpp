@@ -9,10 +9,11 @@ System::System(Renderer* rendererPtr){
     cpu   = new CPU;
     drive = new Drive;
 
-    gpu->getComponents(renderer);
-    bus->getComponents(cpu, gpu, dma, drive);
-    dma->getComponents(gpu, bus);
-    cpu->getComponents(bus);
+      gpu->getComponents(renderer);
+      bus->getComponents(cpu, gpu, dma, drive);
+      dma->getComponents(gpu, bus);
+      cpu->getComponents(bus);
+    drive->getComponents(cpu);
 }
 
 
@@ -24,10 +25,11 @@ System::~System(){
 }
 
 void System::reset(){
-    gpu->reset();
-    dma->reset();
-    bus->reset();
-    cpu->reset();
+      gpu->reset();
+      dma->reset();
+      bus->reset();
+      cpu->reset();
+    drive->reset();
 }
 
 
@@ -38,4 +40,5 @@ void System::loadBIOS(const char* path){
 
 void System::run(){
     cpu->runFrame();
+    //cpu->interruptRequest(IRQ_VBLANK);
 }

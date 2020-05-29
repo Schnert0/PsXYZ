@@ -32,17 +32,17 @@ Uint32 DMA::read(Uint32 offset){
         case 0x00: return channel[chan].baseAddr;
         case 0x04: return channel[chan].block;
         case 0x08: return channel[chan].ctrl;
-        default: printf("[DMA]\tunhandled channel %d register read 0x%02x\n", chan, reg); getchar();
+        default: printf("[DMA]\tunhandled channel %d register read 0x%02x\n", chan, reg);
         }
         break;
     case 7:
         switch(reg){
         case 0x00: return control;
         case 0x04: return getInterrupt();
-        default: printf("[DMA]\tunhandled channel %d register read 0x%02x\n", chan, reg); getchar();
+        default: printf("[DMA]\tunhandled channel %d register read 0x%02x\n", chan, reg);
         }
         break;
-    default: printf("[DMA]\tunhandled DMA channel %d read\n", chan); getchar();
+    default: printf("[DMA]\tunhandled DMA channel %d read\n", chan);
     }
     return 0;
 }
@@ -60,17 +60,17 @@ void DMA::write(Uint32 offset, Uint32 data){
         case 0x00: channel[chan].baseAddr = data & 0xffffff; break;
         case 0x04: channel[chan].block = data; break;
         case 0x08: channel[chan].ctrl = data; break;
-        default: printf("[DMA]\tunhandled channel %d register write 0x%02x with 0x%08x\n", chan, reg, data); getchar();
+        default: printf("[DMA]\tunhandled channel %d register write 0x%02x with 0x%08x\n", chan, reg, data);
         }
         break;
     case 7:
         switch(reg){
         case 0x00: control = data; break;
         case 0x04: setInterrupt(data); break;
-        default: printf("[DMA]\tunhandled channel 7 register write 0x%02x with 0x%08x\n", reg, data); getchar();
+        default: printf("[DMA]\tunhandled channel 7 register write 0x%02x with 0x%08x\n", reg, data);
         }
         break;
-    default: printf("[DMA]\tunhandled DMA channel %d write with 0x%08x\n", chan, data); getchar();
+    default: printf("[DMA]\tunhandled DMA channel %d write with 0x%08x\n", chan, data);
     }
 
     if(dmaActive(chan))
@@ -105,7 +105,7 @@ Uint32 DMA::transferSize(Uint8 chan){
     case 0: return channel[chan].blockSize; break;
     case 1: return channel[chan].blockCount * channel[chan].blockSize; break;
     case 2: return 0; break;
-    default: printf("[DMA]\terror - undefined DMA sync mode\n"); getchar();
+    default: printf("[DMA]\terror - undefined DMA sync mode\n");
     }
     return 0;
 }
@@ -124,7 +124,7 @@ void DMA::doDMA(Uint8 chan){
     case 0:
     case 1: doBlock(chan); break;
     case 2: doLinkedList(chan); break;
-    default: printf("[DMA]\terror - undefined DMA channel sync mode %d\n", channel[chan].sync); getchar();
+    default: printf("[DMA]\terror - undefined DMA channel sync mode %d\n", channel[chan].sync);
     }
 
     channel[chan].enable  = false;
@@ -156,7 +156,7 @@ void DMA::doBlock(Uint8 chan){
                 default: src = (addr - 4) & 0x1fffff;
                 }
                 break;
-            default: printf("[DMA]\terror unhandled DMA channel %d\n", chan); getchar();
+            default: printf("[DMA]\terror unhandled DMA channel %d\n", chan);
             }
             //printf("0x%08x <= 0x%08x\n", addr, src);
             bus->store(addr, src, WIDTH_WORD);
@@ -165,7 +165,7 @@ void DMA::doBlock(Uint8 chan){
             src = bus->load(addr, WIDTH_WORD);
             switch(chan){
             case 2: gpu->gp0Write(src); break;
-            default: printf("[DMA]\terror - undefined DMA channel %d\n", chan); getchar();
+            default: printf("[DMA]\terror - undefined DMA channel %d\n", chan);
             }
             break;
         }
@@ -182,7 +182,6 @@ void DMA::doLinkedList(Uint8 chan){
     Uint32 addr = channel[chan].baseAddr & 0x1ffffc;
     if(channel[chan].dir == 0){
         printf("[DMA]\terror - undefined toRam\n");
-        getchar();
     }
     bool running = true;
     while(running){

@@ -20,6 +20,8 @@ void CPU::reset(){
   currPC = 0xbfc00000;
   nextPC = currPC + 4;
 
+  memset(&cop0, 0, sizeof(cop0));
+
   #ifdef DEBUG
   debug = false;
   #endif // DEBUG
@@ -34,10 +36,15 @@ void CPU::runFrame(){
 }
 
 void CPU::runInstruction(){
-  if((cop0.r[12] & 1) && ((cop0.r[12] & cop0.r[13]) & 0xff00))
+  if((cop0.r[12] & 1) && (cop0.r[12] & cop0.r[13] & 0xff00))
     raiseException(EXCEPTION_INTERRUPT);
 
   ins.raw = bus->load(currPC, WIDTH_WORD);
+
+  if(currPC == 0xb0){
+    if(r[9] == 0x3d)
+      printf("%c", r[4]);
+  }
 
   currPC = nextPC;
   nextPC += 4;
@@ -53,6 +60,11 @@ void CPU::runInstruction(){
   indexDelay = 0;
 
   r[0] = 0;
+
+  //#ifdef DEBUG
+  //if(debug)
+  //  printf("0x%08x:\t", currPC);
+  //#endif // DEBUG
 
   #ifdef DEBUG
   if(debug && !ins.raw) printf("NOP\n");
@@ -104,15 +116,19 @@ void CPU::runInstruction(){
   }
 
   #ifdef DEBUG
+  // /*
   if(debug){
     for(int i = 0; i < 32; i++){
-      printf("r%d:\t0x%08x\n", i, r[i]);
+      printf("r%d:\t0x%08x ", i, r[i]);
+      if((i & 3) == 3) printf("\n");
     }
     printf("\n");
     printf("HI:\t0x%08x\n", hi);
     printf("LO:\t0x%08x\n", lo);
-    printf("PC:\t0x%08x\n", currPC);
+    printf("PC:\t0x%08x\n\n", currPC);
+    getchar();
   }
+  // */
   #endif // DEBUG
 }
 
@@ -153,8 +169,7 @@ void CPU::op_special(){
 
 
 void CPU::raiseException(Uint8 code){
-  if(code == EXCEPTION_INTERRUPT)
-    printf("[CPU]\tinterrupt raised\n");
+  //printf("[CPU]\texception raised\n");
 
   Uint32 sr = cop0.r[12];
   Uint32 cause = cop0.r[13];
@@ -171,16 +186,17 @@ void CPU::raiseException(Uint8 code){
   sr |= (mode << 2) & 0x3f;
   cop0.r[12] = sr;
 
-  cause = code << 2;
+  cause &= ~(0x1f<<2);
+  cause |= code << 2;
   cop0.r[13] = cause;
 
-  if(isBranch){
-    cop0.r[14]  = currPC - 4;
-    cop0.r[13] |= 0x80000000;
-  }else{
+  //if(isBranch || branchDelay){
+  //  cop0.r[14]  = currPC - 4;
+  //  cop0.r[13] |= 0x80000000;
+  //}else{
     cop0.r[14]  = currPC;
     cop0.r[13] &= 0x7fffffff;
-  }
+  //}
 
   currPC = handler;
   nextPC = currPC + 4;
@@ -188,22 +204,31 @@ void CPU::raiseException(Uint8 code){
 
 
 Uint32 CPU::readInterrupt(Uint32 offset){
+  Uint32 data = 0;
   switch(offset){
-  case 0: return istat;
-  case 4: return imask;
+  case 0: data = istat; break;
+  case 4: data = imask; break;
   }
-  return 0;
+  printf("[CPU]\tread from interrupt offset %d and got 0x%08x\n", offset, data);
+  return data;
 }
 
 
 void CPU::writeInterrupt(Uint32 offset, Uint32 data){
+  printf("[CPU]\twrite to interrupt offset %d with 0x%08x\n", offset, data);
   switch(offset){
-  case 0: istat = data; break;
-  case 4: imask = data; break;
+  case 0:
+    if((istat & ~data) != 0)
+      printf("[CPU]\tclearing bits 0x%08x\n", istat & ~data);
+    istat &= data;
+    break;
+  case 4:
+    imask  = data;
+    break;
   }
 
   if(istat & imask){
-    cop0.r[12] |=  (1<<10);
+    cop0.r[13] |=  (1<<10);
   }else{
     cop0.r[13] &= ~(1<<10);
   }
@@ -219,6 +244,7 @@ void CPU::storeReg(Uint8 index, Uint32 data){
   r[index] = data;
 }
 
+
 void CPU::storeLoadDelay(Uint8 index, Uint32 data){
   if(index == indexSlot)
     r[index] = dataSlot;
@@ -227,16 +253,30 @@ void CPU::storeLoadDelay(Uint8 index, Uint32 data){
   dataDelay  = data;
 }
 
+
 Uint32 CPU::loadReg(Uint8 index){
   return r[index];
 }
+
 
 void CPU::jump(){
   nextPC = (currPC & 0xf0000000) | (ins.target << 2);
   branchDelay = true;
 }
 
+
 void CPU::branch(){
   nextPC = currPC + (ins.offset << 2);
   branchDelay = true;
+}
+
+
+void CPU::interruptRequest(Uint8 irq){
+  istat |= 1 << irq;
+  printf("[CPU]\tistat: 0x%08x\n[CPU]\timask: 0x%08x\n", istat, imask);
+  if(istat & imask){
+    cop0.r[13] |=  (1<<10);
+  }else{
+    cop0.r[13] &= ~(1<<10);
+  }
 }

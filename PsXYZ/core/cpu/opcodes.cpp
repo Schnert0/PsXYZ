@@ -1,4 +1,5 @@
 #include "cpu.h"
+//#include "../common.h"
 
 void CPU::op_ILLEGAL(){
     if(!ins.op)
@@ -437,6 +438,7 @@ void CPU::op_MTHI(){
 
 
 void CPU::op_RFE(){
+    //printf("[CPU]\treturning from exception...\n");
     Uint32 sr = cop0.r[12];
 
     Uint32 mode = sr & 0x3f;

@@ -14,8 +14,10 @@ Bus::Bus(){
     memcpy(mask, tmp, sizeof(mask));
 }
 
+
 Bus::~Bus(){
 }
+
 
 void Bus::getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr, Drive* drivePtr){
     cpu   = cpuPtr;
@@ -24,9 +26,11 @@ void Bus::getComponents(CPU* cpuPtr, GPU* gpuPtr, DMA* dmaPtr, Drive* drivePtr){
     drive = drivePtr;
 }
 
+
 void Bus::reset(){
     memset(ram.b, 0, RAM_SIZE);
 }
+
 
 void Bus::loadBIOS(const char* path){
     FILE* file = fopen(path, "rb");
@@ -46,6 +50,7 @@ void Bus::loadBIOS(const char* path){
     fclose(file);
     printf("[BUS]\tBIOS loaded successfully\n");
 }
+
 
 Uint32 Bus::load(Uint32 address, Uint8 width){
     Uint32 addr = address & mask[address >> 29];
@@ -81,10 +86,11 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
           return dma->read(addr - 0x1f801080);
 
         case 0x1f801100 ... 0x1f80112f: // timers
+          return 0xffff;
           break;
 
         case 0x1f801800 ... 0x1f801803: // cd drive registers
-          drive->read(addr - 0x1f801800);
+          return drive->read(addr - 0x1f801800);
           break;
 
         case 0x1f801810: // GP0 register
@@ -121,6 +127,7 @@ Uint32 Bus::load(Uint32 address, Uint8 width){
     //printf("[BUS]\t warning - unhandled load  0x%08x (region adjusted 0x%08x)\n", address, addr);
     return 0;
 }
+
 
 void Bus::store(Uint32 address, Uint32 data, Uint8 width){
     Uint32 addr = address & mask[address >> 29];
